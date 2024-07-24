@@ -108,7 +108,7 @@ app.post('/medium/items',async(req,res)=>{
     try{
         const{_id,item_id,item_name,item_price}=req.body
         const s_item=await catogaries.findOneAndUpdate({_id},
-            {$push:{small:{
+            {$push:{medium:{
                 item_id,item_name,item_price
             }}})
             res.status(200).json({message:'item added',data:s_item})
