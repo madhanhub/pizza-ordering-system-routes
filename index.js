@@ -10,6 +10,7 @@ app.use(express.urlencoded({extended:true}))
 
 const customer=require('./Schema/Customer')
 const catogaries=require('./Schema/Catogaries')
+const homedelivery=require('./Schema/HomeDeliveryOrder')
 
 app.listen(7766,()=>{
     console.log('port run');
@@ -131,10 +132,22 @@ app.post('/large/items',async(req,res)=>{
     try{
         const{_id,item_id,item_name,item_price}=req.body
         const s_item=await catogaries.findOneAndUpdate({_id},
-            {$push:{small:{
+            {$push:{large:{
                 item_id,item_name,item_price
             }}})
             res.status(200).json({message:'item added',data:s_item})
+    }catch(error){
+        res.status(500).json({message:'failed'})
+    }
+})
+
+app.post('/home/delivery',async(req,res)=>{
+    try{
+        const{user_id,user_name}=req.body
+        const home=new homedelivery({
+            user_id,user_name
+        }).save()
+        res.status(200).json({message:'success',data:home})
     }catch(error){
         res.status(500).json({message:'failed'})
     }
