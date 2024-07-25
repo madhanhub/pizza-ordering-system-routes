@@ -13,7 +13,8 @@ const authorization = function (req, res, next) {
         
         if (tokengen) {
             req.id = tokengen.id;
-            req.user_name=tokengen.user_name
+            req.customer_name=tokengen.customer_name
+            req.customer_email=tokengen.customer_email
             next();
         } else {
             res.status(500).json({

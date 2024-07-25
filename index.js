@@ -4,7 +4,7 @@ const mongoose=require('mongoose')
 const morgan=require('morgan')
 const bodyparser=require("body-parser")
 const jsonwebtoken=require('jsonwebtoken')
-const dotenv=require('dotenv')
+const env=require('dotenv').config()
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(bodyparser.json())
@@ -35,9 +35,9 @@ app.get('/',async(req,res)=>{
 
 app.post('/customer/register',async(req,res)=>{
     try{
-        const{customer_name,customer_coupen}=req.body
+        const{customer_name,customer_coupen,customer_email}=req.body
         const customer_register=new customer({
-            customer_name,customer_coupen
+            customer_name,customer_coupen,customer_email
         }).save()
         res.status(200).json({message:'registered',data:customer_register})
     }catch(error){
@@ -151,21 +151,31 @@ app.post('/home/delivery',async(req,res)=>{
         const home=new homedelivery({
             user_id,user_name
         }).save()
-        if(home){
-            let token=await jsonwebtoken.sign({id:home.id,user_name:home.user_name},process.env.SECRET)
+        res.status(200).json({message:'success',data:home})
+    }catch(error){
+        res.status(500).json({message:'failed'})
+    }
+})
+app.post('/user/login',async(req,res)=>{
+    try{
+        const{customer_name,customer_email}=req.body
+        const login=await customer.findOne({
+            customer_name,customer_email})
+        
+        if(login){
+            let token=await jsonwebtoken.sign({id:login.id,customer_name:login.customer_name,customer_email:customer_email.login},process.env.SECRET)
             res.setHeader('token',token)
-            res.setHeader('id',home.id)
-            res.setHeader('user_name',home.customer_name)
+            res.setHeader('id',login.id)
+            res.setHeader('customer_name',login.customer_name)
+            res.setHeader('customer_email',login.customer_email)
             res.status(200).json({message:'success',data:token})
         }
+        
         
     }catch(error){
         res.status(500).json({message:'failed'})
     }
 })
-
-
-
 app.post('/user/details',async(res,req)=>{
     try{
         const{_id,address,mobile_no,landmark}=req.body
