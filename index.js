@@ -3,6 +3,8 @@ const app=express()
 const mongoose=require('mongoose')
 const morgan=require('morgan')
 const bodyparser=require("body-parser")
+const jsonwebtoken=require('jsonwebtoken')
+const dotenv=require('dotenv')
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(bodyparser.json())
@@ -11,6 +13,8 @@ app.use(express.urlencoded({extended:true}))
 const customer=require('./Schema/Customer')
 const catogaries=require('./Schema/Catogaries')
 const homedelivery=require('./Schema/HomeDeliveryOrder')
+
+const authorization=require('./function/auth')
 
 app.listen(7766,()=>{
     console.log('port run');
@@ -147,8 +151,32 @@ app.post('/home/delivery',async(req,res)=>{
         const home=new homedelivery({
             user_id,user_name
         }).save()
-        res.status(200).json({message:'success',data:home})
+        if(home){
+            let token=await jsonwebtoken.sign({id:home.id,user_name:home.user_name},process.env.SECRET)
+            res.setHeader('token',token)
+            res.setHeader('id',home.id)
+            res.setHeader('user_name',home.customer_name)
+            res.status(200).json({message:'success',data:token})
+        }
+        
     }catch(error){
         res.status(500).json({message:'failed'})
+    }
+})
+
+
+
+app.post('/user/details',async(res,req)=>{
+    try{
+        const{_id,address,mobile_no,landmark}=req.body
+        const user_detail=await homedelivery.findOneAndUpdate({_id},
+            {$push:{user_details:{
+                address,
+                mobile_no,
+                landmark
+            }}})
+            res.status(200).json({message:'success',data:user_detail})
+    }catch(error){
+            res.status(500).json({message:'failed'})
     }
 })
