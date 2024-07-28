@@ -219,9 +219,10 @@ app.post('/order/details/added',async(req,res)=>{
 
 app.post('/user/detauls/deleted',async(req,res)=>{
     try{
+        const{_id,address}=req.body
         const user_delete=await homedelivery.findOneAndUpdate({_id},
             {$pull:{user_detaile:{
-                
+                address
             }}})
         res.status(200).json({message:'success',data:user_delete})
     }catch(error){
