@@ -176,7 +176,7 @@ app.post('/user/login',async(req,res)=>{
         res.status(500).json({message:'failed'})
     }
 })
-app.post('/user/details',async(res,req)=>{
+app.post('/user/details',authorization,async(res,req)=>{
     try{
         const{_id,address,mobile_no,landmark}=req.body
         const user_detail=await homedelivery.findOneAndUpdate({_id},
@@ -188,5 +188,43 @@ app.post('/user/details',async(res,req)=>{
             res.status(200).json({message:'success',data:user_detail})
     }catch(error){
             res.status(500).json({message:'failed'})
+    }
+})
+
+app.post('/user/details/addded',async(req,res)=>{
+    try{
+        const{_id,address,mobile_no,landmark}=req.body
+        const details_added=await homedelivery.findOneAndUpdate({_id},
+            {$push:{user_details:{
+                    address,mobile_no,landmark
+            }}})
+            res.status(200).json({message:'success',data:details_added})
+    }catch(error){
+        res.status(500).json({message:'failed'})
+    }
+})
+
+app.post('/order/details/added',async(req,res)=>{
+    try{
+        const{_id,order_id,item_id,item_name,item_price}=req.body
+        const order_details=await homedelivery.findOneAndUpdate({_id},
+            {$push:{order_details:{
+                order_id,item_id,item_name,item_price
+            }}})
+            res.status(200).json({message:'success',data:order_details})
+    }catch(error){
+        res.status(500).json({message:'failed'})
+    }
+})
+
+app.post('/user/detauls/deleted',async(req,res)=>{
+    try{
+        const user_delete=await homedelivery.findOneAndUpdate({_id},
+            {$pull:{user_detaile:{
+                
+            }}})
+        res.status(200).json({message:'success',data:user_delete})
+    }catch(error){
+        res.status(500).json({message:'failed'})
     }
 })

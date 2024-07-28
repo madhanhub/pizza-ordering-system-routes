@@ -7,7 +7,7 @@ const homedelivery=new mongoose.Schema({
         type:String
     },
     user_details:[{
-        Address:{type:String},
+        address:{type:String},
         mobile_no:{type:String},
         landmark:{type:String},
     }],
